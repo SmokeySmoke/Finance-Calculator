@@ -1,0 +1,10 @@
+# Vim files
+*.c~
+*.un~
+*.txt~
+*.js~
+*.css~
+*.html~
+*.gitignore~
+
+a.out
