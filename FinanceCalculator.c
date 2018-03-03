@@ -1,11 +1,11 @@
 /* FinanceCalculator.c -- C implementation of FinanceCalculator.java
  *
  * Prompts the user for desired financial formulas and relevent data and 
- * calculates the present value, future value interest, and annuity payments.
+ * calculates the present value, future value, interest, and annuity payments.
  */
 #include <stdio.h>
 
-void simpleInterestCalc(void);
+float simpleInterestCalc(float, float, float);
 void compInterestCalc(void);
 void annuitiesCalc(void);
 void menu(void);
@@ -15,6 +15,7 @@ float getfloat(void);
 int main(void)
 {
 	char choice;
+	float toInvest, rate, years, interest;
 
 	puts("FINANCE CALCULATOR\n");
 
@@ -23,7 +24,20 @@ int main(void)
 	{
 		switch(choice)
 		{
-			case '1' : simpleInterestCalc();
+			case '1' : puts("\nSIMPLE INTEREST CALCULATOR\n");
+
+				   puts("Enter value of money to invest: ");
+				   toInvest = getfloat();
+				   puts("Enter annual interest rate percentage: ");
+				   rate = getfloat();
+				   puts("Enter number of years to invest: ");
+				   years = getfloat();
+
+				   interest = simpleInterestCalc(toInvest, rate, years);
+				   printf("\nInvestment = %.2f\nInterest Rate = %.2f%%\nYears to Invest = %.2f\n\n",
+						   toInvest, rate, years);
+				   printf("Future value = %.2f\nInterest = %.2f\n\n",
+						   toInvest + interest, interest);
 				   break;
 			case '2' : compInterestCalc();
 				   break;
@@ -39,26 +53,9 @@ int main(void)
 	return 0;
 }
 
-void simpleInterestCalc(void)	// simple interest formula
+float simpleInterestCalc(float investment, float intRate, float years)	// simple interest formula
 {
-	float toInvest, rate, years, interest;
-
-	puts("\nSIMPLE INTEREST CALCULATOR\n");
-
-	puts("Enter value of money to invest: ");
-	toInvest = getfloat();
-	puts("Enter annual interest rate percentage: ");
-	rate = getfloat();
-	puts("Enter number of years to invest: ");
-	years = getfloat();
-
-	interest = toInvest * (rate / 100) * years;
-	printf("\nInvestment = %.2f\nInterest Rate = %.2f%%\nYears to Invest = %.2f\n\n",
-			toInvest, rate, years);
-	printf("Future value = %.2f\nInterest = %.2f\n\n",
-			toInvest + interest, interest);
-
-	return;
+	return investment * (intRate / 100) * years;
 }
 
 void compInterestCalc(void)	// compound interest formula
