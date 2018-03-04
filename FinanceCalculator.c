@@ -4,9 +4,10 @@
  * calculates the present value, future value, interest, and annuity payments.
  */
 #include <stdio.h>
+#include <math.h>
 
 float simpleInterestCalc(float, float, float);
-void compInterestCalc(void);
+float compInterestCalc(char, float, float, float, float);
 void annuitiesCalc(void);
 void menu(void);
 void flush(void);
@@ -15,37 +16,93 @@ float getfloat(void);
 int main(void)
 {
 	char choice;
-	float toInvest, rate, years, interest;
+	int i;
+	const int compChoices[7] = {1,2,4,12,26,56,365};
+	float investment, rate, years, interest, comp;
+	_Bool isComp = 0;
 
 	puts("FINANCE CALCULATOR\n");
 
 	menu();
 	while ((choice = getchar()) != 'q')
 	{
+		flush();
+
 		switch(choice)
 		{
 			case '1' : puts("\nSIMPLE INTEREST CALCULATOR\n");
 
 				   puts("Enter value of money to invest: ");
-				   toInvest = getfloat();
+				   investment = getfloat();
 				   puts("Enter annual interest rate percentage: ");
 				   rate = getfloat();
 				   puts("Enter number of years to invest: ");
 				   years = getfloat();
 
-				   interest = simpleInterestCalc(toInvest, rate, years);
-				   printf("\nInvestment = %.2f\nInterest Rate = %.2f%%\nYears to Invest = %.2f\n\n",
-						   toInvest, rate, years);
-				   printf("Future value = %.2f\nInterest = %.2f\n\n",
-						   toInvest + interest, interest);
+				   interest = simpleInterestCalc(investment, rate, years);
+				   printf("\nFuture value = $%.2f\nInterest = $%.2f\n\n",
+						   investment + interest, interest);
+				   flush();
 				   break;
-			case '2' : compInterestCalc();
+			case '2' : puts("\nCOMPOUND INTEREST CALCULATOR\n");
+
+				   puts("Choose a calculation:\n"	// prompt for calculation
+				   	"1. Find the future value of money invested now.\n"
+					"2. Find the initial value of money that has been invested.");
+				   while ((choice = getchar()) < '1' || choice > '2')
+				   {
+					   puts("Invalid selection. Choose 1 or 2:");
+					   flush();
+				   }
+				   getchar();
+
+				   if (choice == '1')		// prompt for investment
+					   puts("Amount to invest:");
+				   else
+					   puts("Money after investment:");
+				   investment = getfloat();
+
+				   puts("Rate percentage:");
+				   rate = getfloat();
+
+				   puts("Compound period:\n"
+					"Annually      -   1\n"
+					"Semi-Annually -   2\n"
+					"Quarterly     -   4\n"
+					"Monthly       -  12\n"
+					"Bi-Weekly     -  26\n"
+					"Weekly        -  52\n"
+					"Daily         - 365");
+				   while (scanf("%f", &comp) != 1 || !isComp)
+				   {
+					   for (i = 0; i < sizeof compChoices / sizeof(int); i++)
+						   if (comp == compChoices[i])
+							   isComp = 1;
+					   if (isComp)
+						   break;
+					   puts("Invalid selection.");
+					   flush();
+				   }
+
+				   if (choice == '1')
+					   puts("Years to invest:");
+				   else
+					   puts("Years invested:");
+				   years = getfloat();
+
+				   interest = compInterestCalc(choice, investment, rate, comp, years);
+				   if (choice == '1')
+					   printf("\nFuture value: $%.2f\n"
+						  "Interest:     $%.2f\n\n", investment + interest, interest);
+				   else
+					   printf("\nPresent value: $%.2f\n"
+						  "Interest:        $%.2f\n\n", investment - interest, -interest);
+				   flush();
 				   break;
 			case '3' : annuitiesCalc();
 				   break;
 			default  : puts("\nInvalid selection.\n");
 		}
-		flush();
 		menu();
 	}
 	puts("\nDone");
@@ -58,10 +115,13 @@ float simpleInterestCalc(float investment, float intRate, float years)	// simple
 	return investment * (intRate / 100) * years;
 }
 
-void compInterestCalc(void)	// compound interest formula
+float compInterestCalc(char choice, float inv, float r, float cmpPeriod, float y)	// compound interest formula
 {
-	puts("\nCOMPOUND INTEREST CALCULATOR\n");
-	return;
+	float i = (r / 100) / cmpPeriod;
+	float n = cmpPeriod * y;
+	float z = pow(i+1, choice == '1' ? n : -n);
+
+	return (inv * z) - inv;
 }
 
 void annuitiesCalc(void)	// annuity payments formula
@@ -72,7 +132,7 @@ void annuitiesCalc(void)	// annuity payments formula
 
 void menu(void)
 {
-	puts("Choose a calculation (q to quit):\n"
+	puts("Pick a formula (q to quit):\n"
 	     "1. Simple Interest\t2. Compound Interest\t3. Annuities");
 
 	return;
