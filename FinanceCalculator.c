@@ -4,6 +4,7 @@
  * calculates the present value, future value, interest, and annuity payments.
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 float simpleInterestCalc(float, float, float);
@@ -16,7 +17,7 @@ float getfloat(void);
 int main(void)
 {
 	char choice;
-	int i;
+	unsigned i;
 	const int compChoices[7] = {1,2,4,12,26,56,365};
 	float investment, rate, years, interest, comp;
 	_Bool isComp = 0;
@@ -96,7 +97,7 @@ int main(void)
 						  "Interest:     $%.2f\n\n", investment + interest, interest);
 				   else
 					   printf("\nPresent value: $%.2f\n"
-						  "Interest:        $%.2f\n\n", investment - interest, -interest);
+						  "Interest:     $%.2f\n\n", interest, investment - interest);
 				   flush();
 				   break;
 			case '3' : annuitiesCalc();
@@ -115,13 +116,21 @@ float simpleInterestCalc(float investment, float intRate, float years)	// simple
 	return investment * (intRate / 100) * years;
 }
 
-float compInterestCalc(char choice, float inv, float r, float cmpPeriod, float y)	// compound interest formula
+float compInterestCalc(char choice, float inv, float rate, float cmpPeriod, float years)	// compound interest formula
 {
-	float i = (r / 100) / cmpPeriod;
-	float n = cmpPeriod * y;
-	float z = pow(i+1, choice == '1' ? n : -n);
+	float i = (rate / 100) / cmpPeriod;
+	float n = cmpPeriod * years;
+	float z = pow(i+1, n);
 
-	return (inv * z) - inv;
+	if (choice == '1')
+		return inv * z;
+	else if (choice == '2')
+		return inv / z;
+	else
+	{
+		puts("Programming error in comInterestCalc()!");
+		exit(EXIT_FAILURE);
+	}
 }
 
 void annuitiesCalc(void)	// annuity payments formula
